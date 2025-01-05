@@ -1,3 +1,9 @@
+Fork of below repo
+
+# Updates
+- remove outlook, only use gmail
+
+
 # SuperEasy 100% Local RAG with Ollama + Email RAG
 
 ### YouTube Tutorials
