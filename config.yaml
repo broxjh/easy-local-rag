@@ -1,4 +1,4 @@
-vault_file: "vault.txt"
+vault_file: "brox-vault.txt"
 embeddings_file: "vault_embeddings.json"
 ollama_model: "llama3.2"
 top_k: 7

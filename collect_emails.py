@@ -1,5 +1,5 @@
 import imaplib
-from email import policy
+from email import message_from_bytes, policy
 from email.parser import BytesParser
 from datetime import datetime
 import os
@@ -74,6 +74,20 @@ def save_plain_text_content(email_bytes, email_id):
     save_chunks_to_vault(chunks)
     return text_content
 
+def save_attachment(part, email_id, folder_path):
+    if part.get_content_maintype() == 'multipart':
+        return
+    if part.get('Content-Disposition') is None:
+        return
+
+    filename = part.get_filename()
+    if filename:
+        filepath = os.path.join(folder_path, f"{email_id}_{filename}")
+        with open(filepath, 'wb') as f:
+            f.write(part.get_payload(decode=True))
+        print(f"Saved attachment to {filepath}")
+
+
 def search_and_process_emails(imap_client, email_source, search_keyword, start_date, end_date):
     search_criteria = 'ALL'
     if start_date and end_date:
@@ -92,7 +106,13 @@ def search_and_process_emails(imap_client, email_source, search_keyword, start_d
             if typ == 'OK':
                 email_id = num.decode('utf-8')
                 print(f"Downloading and processing email ID: {email_id} from {email_source}")
+                
+                msg = message_from_bytes(email_data[0][1])
+
                 save_plain_text_content(email_data[0][1], email_id)
+                attachment_folder = os.path.join(os.getcwd(), "attachments")
+                for part in msg.walk():
+                    save_attachment(part, email_id, attachment_folder)
             else:
                 print(f"Failed to fetch email ID: {num.decode('utf-8')} from {email_source}")
     else:
@@ -144,8 +164,7 @@ def main():
 
         # Search and process emails from Gmail and Outlook
         search_and_process_emails(M, "Gmail", args.keyword, start_date, end_date)
-        search_and_process_emails(H, "Outlook", args.keyword, start_date, end_date)
-
+    
         M.logout()
     else:
         print(f"Ending early")
