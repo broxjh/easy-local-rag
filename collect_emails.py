@@ -1,13 +1,11 @@
 import imaplib
-import email
 from email import policy
 from email.parser import BytesParser
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 import re
 import argparse
 from bs4 import BeautifulSoup
-import lxml
 from dotenv import load_dotenv
 
 load_dotenv()  # Load environment variables from .env file
@@ -126,25 +124,17 @@ def main():
     # Retrieve email credentials from environment variables
     gmail_username = os.getenv('GMAIL_USERNAME')
     gmail_password = os.getenv('GMAIL_PASSWORD')
-    outlook_username = os.getenv('OUTLOOK_USERNAME')
-    outlook_password = os.getenv('OUTLOOK_PASSWORD')
 
     # Connect to Gmail's IMAP server
     M = imaplib.IMAP4_SSL('imap.gmail.com')
     M.login(gmail_username, gmail_password)
     M.select('inbox')
 
-    # Connect to Outlook IMAP server
-    H = imaplib.IMAP4_SSL('imap-mail.outlook.com')
-    H.login(outlook_username, outlook_password)
-    H.select('inbox')
-
     # Search and process emails from Gmail and Outlook
     search_and_process_emails(M, "Gmail", args.keyword, start_date, end_date)
     search_and_process_emails(H, "Outlook", args.keyword, start_date, end_date)
 
     M.logout()
-    H.logout()
 
 if __name__ == "__main__":
     main()
