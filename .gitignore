@@ -2,3 +2,4 @@
 .env
 *-vault.txt
 *_embeddings.json
+attachments/
